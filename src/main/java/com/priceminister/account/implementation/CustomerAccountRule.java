@@ -14,7 +14,9 @@
  */
 package com.priceminister.account.implementation;
 
-import com.priceminister.account.*;
+import org.apache.commons.lang3.ObjectUtils;
+
+import com.priceminister.account.AccountRule;
 
 
 public class CustomerAccountRule implements AccountRule {
@@ -23,7 +25,8 @@ public class CustomerAccountRule implements AccountRule {
      * @see com.priceminister.account.AccountRule#withdrawPermitted(java.lang.Double)
      */
     public boolean withdrawPermitted(Double resultingAccountBalance) {
-        return resultingAccountBalance >= 0;
+        Double amount = ObjectUtils.defaultIfNull(resultingAccountBalance, 0d);
+        return amount >= 0;
     }
 
 }

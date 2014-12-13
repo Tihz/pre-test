@@ -1,12 +1,11 @@
 package com.priceminister.account;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
-import static org.junit.Assert.*;
-
-import org.junit.*;
-
-import com.priceminister.account.implementation.*;
-
+import com.priceminister.account.implementation.CustomerAccount;
+import com.priceminister.account.implementation.CustomerAccountRule;
 
 /**
  * Please create the business code, starting from the unit tests below.
@@ -19,43 +18,111 @@ import com.priceminister.account.implementation.*;
  * 
  */
 public class CustomerAccountTest {
-    
-    Account customerAccount;
-    AccountRule rule;
+
+	Account customerAccount;
+
+	/**
+	 * @throws java.lang.Exception
+	 */
+	@Before
+	public void setUp() throws Exception {
+		customerAccount = new CustomerAccount();
+		
+	}
+
+	/**
+	 * Tests that an empty account always has a balance of 0.0, not a NULL.
+	 */
+	@Test
+	public void testAccountWithoutMoneyHasZeroBalance() {
+		Double balance = customerAccount.getBalance();
+		Assert.assertEquals(balance, new Double(0));
+	}
+	
+	private Double addAmount(Double amount) {
+        customerAccount.add(amount);
+        return customerAccount.getBalance();
+    }
 
     /**
-     * @throws java.lang.Exception
-     */
-    @Before
-    public void setUp() throws Exception {
-        customerAccount = new CustomerAccount();
-    }
-    
-    /**
-     * Tests that an empty account always has a balance of 0.0, not a NULL.
+     * Adds money to the account and checks that the new balance is as expected.
      */
     @Test
-    public void testAccountWithoutMoneyHasZeroBalance() {
-        fail("not yet implemented");
+    public void testAddPositiveAmount() {
+        Double amount = 1d;
+        Double balance = addAmount(amount);
+        Assert.assertEquals(balance, amount);
+    }
+
+    /**
+     * Adds a negative amount to the account and checks that throw a IllegalArgumentException
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testAddNegativeAmount() {
+        Double amount = -1d;
+        addAmount(amount);
     }
     
     /**
      * Adds money to the account and checks that the new balance is as expected.
      */
     @Test
-    public void testAddPositiveAmount() {
-        fail("not yet implemented");
+    public void testAddNullAmount() {
+        Double amount = null;
+        Double balance = addAmount(amount);
+        Assert.assertEquals(balance, new Double(0));
+    }
+
+	/**
+	 * Tests that an illegal withdrawal throws the expected exception.
+	 * Use the logic contained in CustomerAccountRule; feel free to refactor the existing code.
+	 * 
+	 * @throws IllegalBalanceException
+	 */
+	@Test(expected = IllegalBalanceException.class)
+	public void testWithdrawAndReportBalanceIllegalBalance()
+			throws IllegalBalanceException {
+		Double amount = 1d;
+		AccountRule rule = new CustomerAccountRule();
+		customerAccount.withdrawAndReportBalance(amount, rule);
+	}
+	
+    /**
+     * Tests that a negative amount throws a IllegalArgumentException.
+     * 
+     * @throws IllegalBalanceException
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testWithdrawAndReportBalanceNegativeAmount() 
+            throws IllegalBalanceException {
+        Double amount = -1d;
+        AccountRule rule = new CustomerAccountRule();
+        customerAccount.withdrawAndReportBalance(amount, rule);
     }
     
     /**
-     * Tests that an illegal withdrawal throws the expected exception.
-     * Use the logic contained in CustomerAccountRule; feel free to refactor the existing code.
+     * Tests that a null amount don't throw any exception and has no effect on balance
+     * 
+     * @throws IllegalBalanceException
      */
-    @Test
-    public void testWithdrawAndReportBalanceIllegalBalance() {
-        fail("not yet implemented");
+    public void testWithdrawAndReportBalanceNullAmount() 
+            throws IllegalBalanceException {
+        Double amount = null;
+        AccountRule rule = null;
+        Double balance = customerAccount.withdrawAndReportBalance(amount, rule);
+        Assert.assertEquals(balance, new Double(0));
     }
     
-    // Also implement missing unit tests for the above functionalities.
-
+    /**
+     * Tests that a null rule throws a IllegalArgumentException.
+     * 
+     * @throws IllegalBalanceException
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testWithdrawAndReportBalanceNullRule() 
+            throws IllegalBalanceException {
+        Double amount = 0d;
+        AccountRule rule = null;
+        customerAccount.withdrawAndReportBalance(amount, rule);
+    }
 }
